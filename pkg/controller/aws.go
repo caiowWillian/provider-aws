@@ -27,6 +27,20 @@ import (
 	"github.com/crossplane/provider-aws/pkg/controller/acm"
 	"github.com/crossplane/provider-aws/pkg/controller/acmpca/certificateauthority"
 	"github.com/crossplane/provider-aws/pkg/controller/acmpca/certificateauthoritypermission"
+	apigatewayapikey "github.com/crossplane/provider-aws/pkg/controller/apigateway/apikey"
+	apigatewayauthorizer "github.com/crossplane/provider-aws/pkg/controller/apigateway/authorizer"
+	"github.com/crossplane/provider-aws/pkg/controller/apigateway/basepathmapping"
+	apigatewaydeployment "github.com/crossplane/provider-aws/pkg/controller/apigateway/deployment"
+	"github.com/crossplane/provider-aws/pkg/controller/apigateway/documentationpart"
+	"github.com/crossplane/provider-aws/pkg/controller/apigateway/documentationversion"
+	apigatewaydomainame "github.com/crossplane/provider-aws/pkg/controller/apigateway/domainname"
+	apigatewaymodel "github.com/crossplane/provider-aws/pkg/controller/apigateway/model"
+	"github.com/crossplane/provider-aws/pkg/controller/apigateway/requestvalidator"
+	"github.com/crossplane/provider-aws/pkg/controller/apigateway/resource"
+	"github.com/crossplane/provider-aws/pkg/controller/apigateway/restapi"
+	apigatewaystage "github.com/crossplane/provider-aws/pkg/controller/apigateway/stage"
+	"github.com/crossplane/provider-aws/pkg/controller/apigateway/usageplan"
+	apigatewayvpclink "github.com/crossplane/provider-aws/pkg/controller/apigateway/vpclink"
 	"github.com/crossplane/provider-aws/pkg/controller/apigatewayv2/api"
 	"github.com/crossplane/provider-aws/pkg/controller/apigatewayv2/apimapping"
 	"github.com/crossplane/provider-aws/pkg/controller/apigatewayv2/authorizer"
@@ -263,6 +277,20 @@ func Setup(mgr ctrl.Manager, l logging.Logger, rl workqueue.RateLimiter, poll ti
 		transitgatewayroutetable.SetupTransitGatewayRouteTable,
 		vpcendpointserviceconfiguration.SetupVPCEndpointServiceConfiguration,
 		kinesisstream.SetupStream,
+		apigatewayapikey.SetupStage,
+		apigatewayauthorizer.SetupStage,
+		basepathmapping.SetupStage,
+		apigatewaydeployment.SetupStage,
+		documentationpart.SetupStage,
+		documentationversion.SetupStage,
+		apigatewaydomainame.SetupStage,
+		apigatewaymodel.SetupStage,
+		requestvalidator.SetupStage,
+		resource.SetupStage,
+		restapi.SetupStage,
+		apigatewaystage.SetupStage,
+		usageplan.SetupStage,
+		apigatewayvpclink.SetupStage,
 	} {
 		if err := setup(mgr, l, rl, poll); err != nil {
 			return err
