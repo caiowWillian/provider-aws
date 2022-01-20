@@ -1,0 +1,4 @@
+ignore:
+  field_paths:
+    - Deployment.ApiSummary
+    
