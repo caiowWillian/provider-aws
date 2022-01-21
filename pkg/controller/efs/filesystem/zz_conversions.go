@@ -21,7 +21,6 @@ package filesystem
 import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	svcsdk "github.com/aws/aws-sdk-go/service/efs"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	svcapitypes "github.com/crossplane/provider-aws/apis/efs/v1alpha1"
 )
@@ -151,7 +150,7 @@ func GenerateFileSystem(resp *svcsdk.DescribeFileSystemsOutput) *svcapitypes.Fil
 		return cr
 	}
 
-	return cr
+return cr
 }
 
 // GenerateCreateFileSystemInput returns a create input.
@@ -187,7 +186,6 @@ func GenerateCreateFileSystemInput(cr *svcapitypes.FileSystem) *svcsdk.CreateFil
 
 	return res
 }
-
 // GenerateUpdateFileSystemInput returns an update input.
 func GenerateUpdateFileSystemInput(cr *svcapitypes.FileSystem) *svcsdk.UpdateFileSystemInput {
 	res := &svcsdk.UpdateFileSystemInput{}
@@ -216,5 +214,5 @@ func GenerateDeleteFileSystemInput(cr *svcapitypes.FileSystem) *svcsdk.DeleteFil
 // IsNotFound returns whether the given error is of type NotFound or not.
 func IsNotFound(err error) bool {
 	awsErr, ok := err.(awserr.Error)
-	return ok && awsErr.Code() == "FileSystemNotFound"
+	return ok && awsErr.Code() == "FileSystemNotFound" 
 }

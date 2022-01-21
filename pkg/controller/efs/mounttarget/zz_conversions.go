@@ -106,7 +106,7 @@ func GenerateMountTarget(resp *svcsdk.DescribeMountTargetsOutput) *svcapitypes.M
 		return cr
 	}
 
-	return cr
+return cr
 }
 
 // GenerateCreateMountTargetInput returns a create input.
@@ -119,6 +119,7 @@ func GenerateCreateMountTargetInput(cr *svcapitypes.MountTarget) *svcsdk.CreateM
 
 	return res
 }
+
 
 // GenerateDeleteMountTargetInput returns a deletion input.
 func GenerateDeleteMountTargetInput(cr *svcapitypes.MountTarget) *svcsdk.DeleteMountTargetInput {
@@ -134,5 +135,5 @@ func GenerateDeleteMountTargetInput(cr *svcapitypes.MountTarget) *svcsdk.DeleteM
 // IsNotFound returns whether the given error is of type NotFound or not.
 func IsNotFound(err error) bool {
 	awsErr, ok := err.(awserr.Error)
-	return ok && awsErr.Code() == "MountTargetNotFound"
+	return ok && awsErr.Code() == "MountTargetNotFound" 
 }

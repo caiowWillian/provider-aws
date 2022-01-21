@@ -30,26 +30,26 @@ type MountTargetParameters struct {
 	// +kubebuilder:validation:Required
 	Region string `json:"region"`
 	// Valid IPv4 address within the address range of the specified subnet.
-	IPAddress                   *string `json:"ipAddress,omitempty"`
+	 IPAddress *string `json:"ipAddress,omitempty"` 
 	CustomMountTargetParameters `json:",inline"`
 }
 
 // MountTargetSpec defines the desired state of MountTarget
 type MountTargetSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
-	ForProvider       MountTargetParameters `json:"forProvider"`
+	ForProvider MountTargetParameters `json:"forProvider"`
 }
 
 // MountTargetObservation defines the observed state of MountTarget
 type MountTargetObservation struct {
 	// The unique and consistent identifier of the Availability Zone (AZ) that the
-	// mount target resides in. For example, use1-az1 is an AZ ID for the us-east-1
-	// Region and it has the same location in every AWS account.
+// mount target resides in. For example, use1-az1 is an AZ ID for the us-east-1
+// Region and it has the same location in every AWS account.
 	AvailabilityZoneID *string `json:"availabilityZoneID,omitempty"`
 	// The name of the Availability Zone (AZ) that the mount target resides in.
-	// AZs are independently mapped to names for each AWS account. For example,
-	// the Availability Zone us-east-1a for your AWS account might not be the same
-	// location as us-east-1a for another AWS account.
+// AZs are independently mapped to names for each AWS account. For example,
+// the Availability Zone us-east-1a for your AWS account might not be the same
+// location as us-east-1a for another AWS account.
 	AvailabilityZoneName *string `json:"availabilityZoneName,omitempty"`
 	// The ID of the file system for which the mount target is intended.
 	FileSystemID *string `json:"fileSystemID,omitempty"`
@@ -58,7 +58,7 @@ type MountTargetObservation struct {
 	// System-assigned mount target ID.
 	MountTargetID *string `json:"mountTargetID,omitempty"`
 	// The ID of the network interface that Amazon EFS created when it created the
-	// mount target.
+// mount target.
 	NetworkInterfaceID *string `json:"networkInterfaceID,omitempty"`
 	// AWS account ID that owns the resource.
 	OwnerID *string `json:"ownerID,omitempty"`
@@ -71,8 +71,9 @@ type MountTargetObservation struct {
 // MountTargetStatus defines the observed state of MountTarget.
 type MountTargetStatus struct {
 	xpv1.ResourceStatus `json:",inline"`
-	AtProvider          MountTargetObservation `json:"atProvider,omitempty"`
+	AtProvider MountTargetObservation `json:"atProvider,omitempty"`
 }
+
 
 // +kubebuilder:object:root=true
 
@@ -85,8 +86,8 @@ type MountTargetStatus struct {
 type MountTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-	Spec              MountTargetSpec   `json:"spec"`
-	Status            MountTargetStatus `json:"status,omitempty"`
+	Spec   MountTargetSpec   `json:"spec"`
+	Status MountTargetStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -95,7 +96,7 @@ type MountTarget struct {
 type MountTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []MountTarget `json:"items"`
+	Items []MountTarget `json:"items"`
 }
 
 // Repository type metadata.
@@ -109,3 +110,4 @@ var (
 func init() {
 	SchemeBuilder.Register(&MountTarget{}, &MountTargetList{})
 }
+

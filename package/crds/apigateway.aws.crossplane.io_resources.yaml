@@ -1,0 +1,412 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.2
+  creationTimestamp: null
+  name: resources.apigateway.aws.crossplane.io
+spec:
+  group: apigateway.aws.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - aws
+    kind: Resource
+    listKind: ResourceList
+    plural: resources
+    singular: resource
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Resource is the Schema for the Resources API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ResourceSpec defines the desired state of Resource
+            properties:
+              deletionPolicy:
+                default: Delete
+                description: DeletionPolicy specifies what will happen to the underlying
+                  external when this managed resource is deleted - either "Delete"
+                  or "Orphan" the external resource.
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                description: ResourceParameters defines the desired state of Resource
+                properties:
+                  ParentIdSelector:
+                    description: ParentIdSelector is a reference to an API used to
+                      set the parentID.
+                    properties:
+                      matchControllerRef:
+                        description: MatchControllerRef ensures an object with the
+                          same controller reference as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                    type: object
+                  parentID:
+                    description: ParentID is the ID for the Parent.
+                    type: string
+                  parentIdRef:
+                    description: ParentIdRef is a reference to an API used to set
+                      the parentID.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  pathPart:
+                    description: The last path segment for this resource.
+                    type: string
+                  region:
+                    description: Region is which region the Resource will be created.
+                    type: string
+                  restAPIID:
+                    description: RestAPIID is the ID for the API.
+                    type: string
+                  restAPIIDRef:
+                    description: RestAPIIDRef is a reference to an API used to set
+                      the restAPIID.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  restAPIIDSelector:
+                    description: RestAPIIDSelector is a reference to an API used to
+                      set to set the RestAPIID.
+                    properties:
+                      matchControllerRef:
+                        description: MatchControllerRef ensures an object with the
+                          same controller reference as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                    type: object
+                required:
+                - parentID
+                - pathPart
+                - region
+                - restAPIID
+                type: object
+              providerConfigRef:
+                default:
+                  name: default
+                description: ProviderConfigReference specifies how the provider that
+                  will be used to create, observe, update, and delete this managed
+                  resource should be configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              providerRef:
+                description: 'ProviderReference specifies the provider that will be
+                  used to create, observe, update, and delete this managed resource.
+                  Deprecated: Please use ProviderConfigReference, i.e. `providerConfigRef`'
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: WriteConnectionSecretToReference specifies the namespace
+                  and name of a Secret to which any connection details for this managed
+                  resource should be written. Connection details frequently include
+                  the endpoint, username, and password required to connect to the
+                  managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+          status:
+            description: ResourceStatus defines the observed state of Resource.
+            properties:
+              atProvider:
+                description: ResourceObservation defines the observed state of Resource
+                properties:
+                  id:
+                    description: The resource's identifier.
+                    type: string
+                  path:
+                    description: The full path for this resource.
+                    type: string
+                  resourceMethods:
+                    additionalProperties:
+                      properties:
+                        apiKeyRequired:
+                          type: boolean
+                        authorizationScopes:
+                          items:
+                            type: string
+                          type: array
+                        authorizationType:
+                          type: string
+                        authorizerID:
+                          type: string
+                        httpMethod:
+                          type: string
+                        methodIntegration:
+                          description: "Represents an HTTP, HTTP_PROXY, AWS, AWS_PROXY,
+                            or Mock integration. \n In the API Gateway console, the
+                            built-in Lambda integration is an AWS integration. \n
+                            Creating an API (https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-create-api.html)"
+                          properties:
+                            cacheKeyParameters:
+                              items:
+                                type: string
+                              type: array
+                            cacheNamespace:
+                              type: string
+                            connectionID:
+                              type: string
+                            connectionType:
+                              type: string
+                            contentHandling:
+                              type: string
+                            credentials:
+                              type: string
+                            httpMethod:
+                              type: string
+                            integrationResponses:
+                              additionalProperties:
+                                properties:
+                                  contentHandling:
+                                    type: string
+                                  responseParameters:
+                                    additionalProperties:
+                                      type: string
+                                    type: object
+                                  responseTemplates:
+                                    additionalProperties:
+                                      type: string
+                                    type: object
+                                  selectionPattern:
+                                    type: string
+                                  statusCode:
+                                    description: The status code.
+                                    type: string
+                                type: object
+                              type: object
+                            passthroughBehavior:
+                              type: string
+                            requestParameters:
+                              additionalProperties:
+                                type: string
+                              type: object
+                            requestTemplates:
+                              additionalProperties:
+                                type: string
+                              type: object
+                            timeoutInMillis:
+                              format: int64
+                              type: integer
+                            tlsConfig:
+                              properties:
+                                insecureSkipVerification:
+                                  type: boolean
+                              type: object
+                            type_:
+                              description: The integration type. The valid value is
+                                HTTP for integrating an API method with an HTTP backend;
+                                AWS with any AWS service endpoints; MOCK for testing
+                                without actually invoking the backend; HTTP_PROXY
+                                for integrating with the HTTP proxy integration; AWS_PROXY
+                                for integrating with the Lambda proxy integration.
+                              type: string
+                            uri:
+                              type: string
+                          type: object
+                        methodResponses:
+                          additionalProperties:
+                            properties:
+                              responseModels:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                              responseParameters:
+                                additionalProperties:
+                                  type: boolean
+                                type: object
+                              statusCode:
+                                description: The status code.
+                                type: string
+                            type: object
+                          type: object
+                        operationName:
+                          type: string
+                        requestModels:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        requestParameters:
+                          additionalProperties:
+                            type: boolean
+                          type: object
+                        requestValidatorID:
+                          type: string
+                      type: object
+                    description: "Gets an API resource's method of a given HTTP verb.
+                      \n The resource methods are a map of methods indexed by methods'
+                      HTTP verbs enabled on the resource. This method map is included
+                      in the 200 OK response of the GET /restapis/{restapi_id}/resources/{resource_id}
+                      or GET /restapis/{restapi_id}/resources/{resource_id}?embed=methods
+                      request. \n Example: Get the GET method of an API resource \n
+                      Request  GET /restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET
+                      HTTP/1.1 Content-Type:  application/json Host: apigateway.us-east-1.amazonaws.com
+                      X-Amz-Date: 20170223T031827Z  Authorization: AWS4-HMAC-SHA256
+                      Credential={access_key_ID}/20170223/us-east-1/apigateway/aws4_request,
+                      \ SignedHeaders=content-type;host;x-amz-date, Signature={sig4_hash}
+                      Response  { \"_links\": { \"curies\": [ { \"href\": \"https://docs.aws.amazon.com/apigateway/latest/developerguide/restapi-integration-{rel}.html\",
+                      \ \"name\": \"integration\", \"templated\": true }, { \"href\":
+                      \"https://docs.aws.amazon.com/apigateway/latest/developerguide/restapi-integration-response-{rel}.html\",
+                      \ \"name\": \"integrationresponse\", \"templated\": true },
+                      { \"href\": \"https://docs.aws.amazon.com/apigateway/latest/developerguide/restapi-method-{rel}.html\",
+                      \ \"name\": \"method\", \"templated\": true }, { \"href\": \"https://docs.aws.amazon.com/apigateway/latest/developerguide/restapi-method-response-{rel}.html\",
+                      \ \"name\": \"methodresponse\", \"templated\": true } ], \"self\":
+                      { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET\",
+                      \ \"name\": \"GET\", \"title\": \"GET\" }, \"integration:put\":
+                      { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration\"
+                      \ }, \"method:delete\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET\"
+                      \ }, \"method:integration\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration\"
+                      \ }, \"method:responses\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/responses/200\",
+                      \ \"name\": \"200\", \"title\": \"200\" }, \"method:update\":
+                      { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET\"
+                      \ }, \"methodresponse:put\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/responses/{status_code}\",
+                      \ \"templated\": true } }, \"apiKeyRequired\": false, \"authorizationType\":
+                      \"NONE\",  \"httpMethod\": \"GET\", \"_embedded\": { \"method:integration\":
+                      { \"_links\": {  \"self\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration\"
+                      \ }, \"integration:delete\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration\"
+                      \ }, \"integration:responses\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration/responses/200\",
+                      \ \"name\": \"200\", \"title\": \"200\" }, \"integration:update\":
+                      { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration\"
+                      \ }, \"integrationresponse:put\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration/responses/{status_code}\",
+                      \ \"templated\": true } }, \"cacheKeyParameters\": [], \"cacheNamespace\":
+                      \"3kzxbg5sa2\",  \"credentials\": \"arn:aws:iam::123456789012:role/apigAwsProxyRole\",
+                      \"httpMethod\":  \"POST\", \"passthroughBehavior\": \"WHEN_NO_MATCH\",
+                      \"requestParameters\": { \"integration.request.header.Content-Type\":
+                      \ \"'application/x-amz-json-1.1'\" }, \"requestTemplates\":
+                      { \"application/json\":  \"{\\n}\" }, \"type\": \"AWS\", \"uri\":
+                      \"arn:aws:apigateway:us-east-1:kinesis:action/ListStreams\",
+                      \ \"_embedded\": { \"integration:responses\": { \"_links\":
+                      { \"self\": { \"href\":  \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration/responses/200\",
+                      \ \"name\": \"200\", \"title\": \"200\" }, \"integrationresponse:delete\":
+                      { \"href\":  \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration/responses/200\"
+                      \ }, \"integrationresponse:update\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/integration/responses/200\"
+                      \ } }, \"responseParameters\": { \"method.response.header.Content-Type\":
+                      \"'application/xml'\"  }, \"responseTemplates\": { \"application/json\":
+                      \"$util.urlDecode(\\\"%3CkinesisStreams%3E#foreach($stream  in
+                      $input.path('$.StreamNames'))%3Cstream%3E%3Cname%3E$stream%3C/name%3E%3C/stream%3E#end%3C/kinesisStreams%3E\\\")\\n\"
+                      \ }, \"statusCode\": \"200\" } } }, \"method:responses\": {
+                      \"_links\": { \"self\":  { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/responses/200\",
+                      \ \"name\": \"200\", \"title\": \"200\" }, \"methodresponse:delete\":
+                      { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/responses/200\"
+                      \ }, \"methodresponse:update\": { \"href\": \"/restapis/fugvjdxtri/resources/3kzxbg5sa2/methods/GET/responses/200\"
+                      \ } }, \"responseModels\": { \"application/json\": \"Empty\"
+                      }, \"responseParameters\":  { \"method.response.header.Content-Type\":
+                      false }, \"statusCode\": \"200\" }  } } If the OPTIONS is enabled
+                      on the resource, you can follow the example here to get that
+                      method. Just replace the GET of the last path segment in the
+                      request URL with OPTIONS."
+                    type: object
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: LastTransitionTime is the last time this condition
+                        transitioned from one status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A Message containing details about this condition's
+                        last transition from one status to another, if any.
+                      type: string
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: Type of this condition. At most one of each condition
+                        type may apply to a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

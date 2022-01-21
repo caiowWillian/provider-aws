@@ -21,18 +21,18 @@ package filesystem
 import (
 	"context"
 
-	svcapi "github.com/aws/aws-sdk-go/service/efs"
-	svcsdk "github.com/aws/aws-sdk-go/service/efs"
-	svcsdkapi "github.com/aws/aws-sdk-go/service/efs/efsiface"
-	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
+	"github.com/google/go-cmp/cmp"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	svcsdkapi "github.com/aws/aws-sdk-go/service/efs/efsiface"
+	svcapi "github.com/aws/aws-sdk-go/service/efs"
+	svcsdk "github.com/aws/aws-sdk-go/service/efs"
 
-	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	cpresource "github.com/crossplane/crossplane-runtime/pkg/resource"
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 
 	svcapitypes "github.com/crossplane/provider-aws/apis/efs/v1alpha1"
 	awsclient "github.com/crossplane/provider-aws/pkg/clients"
@@ -42,10 +42,10 @@ const (
 	errUnexpectedObject = "managed resource is not an FileSystem resource"
 
 	errCreateSession = "cannot create a new session"
-	errCreate        = "cannot create FileSystem in AWS"
-	errUpdate        = "cannot update FileSystem in AWS"
-	errDescribe      = "failed to describe FileSystem"
-	errDelete        = "failed to delete FileSystem"
+	errCreate = "cannot create FileSystem in AWS"
+	errUpdate = "cannot update FileSystem in AWS"
+	errDescribe = "failed to describe FileSystem"
+	errDelete = "failed to delete FileSystem"
 )
 
 type connector struct {
@@ -98,8 +98,8 @@ func (e *external) Observe(ctx context.Context, mg cpresource.Managed) (managed.
 		return managed.ExternalObservation{}, errors.Wrap(err, "isUpToDate check failed")
 	}
 	return e.postObserve(ctx, cr, resp, managed.ExternalObservation{
-		ResourceExists:          true,
-		ResourceUpToDate:        upToDate,
+		ResourceExists:   true,
+		ResourceUpToDate: upToDate,
 		ResourceLateInitialized: !cmp.Equal(&cr.Spec.ForProvider, currentSpec),
 	}, nil)
 }
@@ -273,21 +273,20 @@ func newExternal(kube client.Client, client svcsdkapi.EFSAPI, opts []option) *ex
 }
 
 type external struct {
-	kube           client.Client
-	client         svcsdkapi.EFSAPI
-	preObserve     func(context.Context, *svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsInput) error
-	postObserve    func(context.Context, *svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsOutput, managed.ExternalObservation, error) (managed.ExternalObservation, error)
-	filterList     func(*svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsOutput) *svcsdk.DescribeFileSystemsOutput
+	kube        client.Client
+	client      svcsdkapi.EFSAPI
+	preObserve  func(context.Context, *svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsInput) error
+	postObserve func(context.Context, *svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsOutput, managed.ExternalObservation, error) (managed.ExternalObservation, error)
+	filterList func(*svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsOutput) *svcsdk.DescribeFileSystemsOutput
 	lateInitialize func(*svcapitypes.FileSystemParameters, *svcsdk.DescribeFileSystemsOutput) error
 	isUpToDate     func(*svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsOutput) (bool, error)
-	preCreate      func(context.Context, *svcapitypes.FileSystem, *svcsdk.CreateFileSystemInput) error
-	postCreate     func(context.Context, *svcapitypes.FileSystem, *svcsdk.FileSystemDescription, managed.ExternalCreation, error) (managed.ExternalCreation, error)
-	preDelete      func(context.Context, *svcapitypes.FileSystem, *svcsdk.DeleteFileSystemInput) (bool, error)
-	postDelete     func(context.Context, *svcapitypes.FileSystem, *svcsdk.DeleteFileSystemOutput, error) error
-	preUpdate      func(context.Context, *svcapitypes.FileSystem, *svcsdk.UpdateFileSystemInput) error
-	postUpdate     func(context.Context, *svcapitypes.FileSystem, *svcsdk.UpdateFileSystemOutput, managed.ExternalUpdate, error) (managed.ExternalUpdate, error)
+	preCreate   func(context.Context, *svcapitypes.FileSystem, *svcsdk.CreateFileSystemInput) error
+	postCreate  func(context.Context, *svcapitypes.FileSystem, *svcsdk.FileSystemDescription, managed.ExternalCreation, error) (managed.ExternalCreation, error)
+	preDelete   func(context.Context, *svcapitypes.FileSystem, *svcsdk.DeleteFileSystemInput) (bool, error)
+	postDelete  func(context.Context, *svcapitypes.FileSystem, *svcsdk.DeleteFileSystemOutput, error) error
+	preUpdate   func(context.Context, *svcapitypes.FileSystem, *svcsdk.UpdateFileSystemInput) error
+	postUpdate  func(context.Context, *svcapitypes.FileSystem, *svcsdk.UpdateFileSystemOutput, managed.ExternalUpdate, error) (managed.ExternalUpdate, error)
 }
-
 func nopPreObserve(context.Context, *svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsInput) error {
 	return nil
 }
@@ -304,6 +303,7 @@ func nopLateInitialize(*svcapitypes.FileSystemParameters, *svcsdk.DescribeFileSy
 func alwaysUpToDate(*svcapitypes.FileSystem, *svcsdk.DescribeFileSystemsOutput) (bool, error) {
 	return true, nil
 }
+
 
 func nopPreCreate(context.Context, *svcapitypes.FileSystem, *svcsdk.CreateFileSystemInput) error {
 	return nil

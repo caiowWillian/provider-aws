@@ -21,17 +21,18 @@ package mounttarget
 import (
 	"context"
 
+	"github.com/pkg/errors"
+	"github.com/google/go-cmp/cmp"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	svcsdkapi "github.com/aws/aws-sdk-go/service/efs/efsiface"
 	svcapi "github.com/aws/aws-sdk-go/service/efs"
 	svcsdk "github.com/aws/aws-sdk-go/service/efs"
-	svcsdkapi "github.com/aws/aws-sdk-go/service/efs/efsiface"
-	"github.com/google/go-cmp/cmp"
-	"github.com/pkg/errors"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	cpresource "github.com/crossplane/crossplane-runtime/pkg/resource"
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 
 	svcapitypes "github.com/crossplane/provider-aws/apis/efs/v1alpha1"
 	awsclient "github.com/crossplane/provider-aws/pkg/clients"
@@ -41,10 +42,10 @@ const (
 	errUnexpectedObject = "managed resource is not an MountTarget resource"
 
 	errCreateSession = "cannot create a new session"
-	errCreate        = "cannot create MountTarget in AWS"
-	errUpdate        = "cannot update MountTarget in AWS"
-	errDescribe      = "failed to describe MountTarget"
-	errDelete        = "failed to delete MountTarget"
+	errCreate = "cannot create MountTarget in AWS"
+	errUpdate = "cannot update MountTarget in AWS"
+	errDescribe = "failed to describe MountTarget"
+	errDelete = "failed to delete MountTarget"
 )
 
 type connector struct {
@@ -97,8 +98,8 @@ func (e *external) Observe(ctx context.Context, mg cpresource.Managed) (managed.
 		return managed.ExternalObservation{}, errors.Wrap(err, "isUpToDate check failed")
 	}
 	return e.postObserve(ctx, cr, resp, managed.ExternalObservation{
-		ResourceExists:          true,
-		ResourceUpToDate:        upToDate,
+		ResourceExists:   true,
+		ResourceUpToDate: upToDate,
 		ResourceLateInitialized: !cmp.Equal(&cr.Spec.ForProvider, currentSpec),
 	}, nil)
 }
@@ -174,7 +175,7 @@ func (e *external) Create(ctx context.Context, mg cpresource.Managed) (managed.E
 
 func (e *external) Update(ctx context.Context, mg cpresource.Managed) (managed.ExternalUpdate, error) {
 	return e.update(ctx, mg)
-
+	
 }
 
 func (e *external) Delete(ctx context.Context, mg cpresource.Managed) error {
@@ -219,20 +220,20 @@ func newExternal(kube client.Client, client svcsdkapi.EFSAPI, opts []option) *ex
 }
 
 type external struct {
-	kube           client.Client
-	client         svcsdkapi.EFSAPI
-	preObserve     func(context.Context, *svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsInput) error
-	postObserve    func(context.Context, *svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsOutput, managed.ExternalObservation, error) (managed.ExternalObservation, error)
-	filterList     func(*svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsOutput) *svcsdk.DescribeMountTargetsOutput
+	kube        client.Client
+	client      svcsdkapi.EFSAPI
+	preObserve  func(context.Context, *svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsInput) error
+	postObserve func(context.Context, *svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsOutput, managed.ExternalObservation, error) (managed.ExternalObservation, error)
+	filterList func(*svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsOutput) *svcsdk.DescribeMountTargetsOutput
 	lateInitialize func(*svcapitypes.MountTargetParameters, *svcsdk.DescribeMountTargetsOutput) error
 	isUpToDate     func(*svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsOutput) (bool, error)
-	preCreate      func(context.Context, *svcapitypes.MountTarget, *svcsdk.CreateMountTargetInput) error
-	postCreate     func(context.Context, *svcapitypes.MountTarget, *svcsdk.MountTargetDescription, managed.ExternalCreation, error) (managed.ExternalCreation, error)
-	preDelete      func(context.Context, *svcapitypes.MountTarget, *svcsdk.DeleteMountTargetInput) (bool, error)
-	postDelete     func(context.Context, *svcapitypes.MountTarget, *svcsdk.DeleteMountTargetOutput, error) error
-	update         func(context.Context, cpresource.Managed) (managed.ExternalUpdate, error)
+	preCreate   func(context.Context, *svcapitypes.MountTarget, *svcsdk.CreateMountTargetInput) error
+	postCreate  func(context.Context, *svcapitypes.MountTarget, *svcsdk.MountTargetDescription, managed.ExternalCreation, error) (managed.ExternalCreation, error)
+	preDelete   func(context.Context, *svcapitypes.MountTarget, *svcsdk.DeleteMountTargetInput) (bool, error)
+	postDelete  func(context.Context, *svcapitypes.MountTarget, *svcsdk.DeleteMountTargetOutput, error) error
+	update      func(context.Context, cpresource.Managed) (managed.ExternalUpdate, error)
+	
 }
-
 func nopPreObserve(context.Context, *svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsInput) error {
 	return nil
 }
@@ -249,6 +250,7 @@ func nopLateInitialize(*svcapitypes.MountTargetParameters, *svcsdk.DescribeMount
 func alwaysUpToDate(*svcapitypes.MountTarget, *svcsdk.DescribeMountTargetsOutput) (bool, error) {
 	return true, nil
 }
+
 
 func nopPreCreate(context.Context, *svcapitypes.MountTarget, *svcsdk.CreateMountTargetInput) error {
 	return nil
